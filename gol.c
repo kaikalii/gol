@@ -2,13 +2,14 @@
 This is a very simple implementation of Conway's game of life.
 
 By default, running this program will show 4 generations of the
-game with a random initial configuration. 4 presets can be
-specified by passing their names as command line arguments:
+game with a random initial configuration. 5 presets can be
+specified by passing one of their names as a command line argument:
 
     - blinker
     - toad
     - beacon
     - glider
+    - rpentamino
 
 The command line flag '-f' will enable "forever" mode, which will
 simulate the game until iterrupted.
@@ -19,6 +20,7 @@ simulate the game until iterrupted.
 #include <string.h>
 #include <ctype.h>
 #include <time.h>
+#include <stdbool.h>
 
 // Game constants
 enum { N = 8 };
@@ -33,13 +35,14 @@ typedef enum {
     blinker,
     toad,
     beacon,
-    glider
+    glider,
+    rpentamino
 } initial_state;
 
 void string_to_lower(char* s);
 int mod(int x, int m);
 board_t* create_board(initial_state state);
-board_t* clone_board(const board_t* board);
+board_t* clone_board(board_t* board);
 void delete_board(board_t* board);
 void randomize_board(board_t* board);
 char* board_get(board_t* board, int i, int j);
@@ -50,16 +53,17 @@ void sleep_ms(int milliseconds);
 int main(int argc, char** argv) {
     // Parse cmd line args
     int i;
-    int forever = 0;
+    bool forever = false;
     initial_state state = _random;
     for(i = 1; i < argc; i++) {
         char* arg = argv[i];
         string_to_lower(arg);
-        if(!strcmp(arg, "-f")) forever = 1;
+        if(!strcmp(arg, "-f")) forever = true;
         else if(!strcmp(arg, "blinker")) state = blinker;
         else if(!strcmp(arg, "toad")) state = toad;
         else if(!strcmp(arg, "beacon")) state = beacon;
         else if(!strcmp(arg, "glider")) state = glider;
+        else if(!strcmp(arg, "rpentamino")) state = rpentamino;
     }
     // Create board
     board_t* board = create_board(state);
@@ -137,6 +141,14 @@ board_t* create_board(initial_state state) {
             *board_get(board, 2, 2) = ALIVE;
             break;
         }
+        case rpentamino: {
+            *board_get(board, 4, 3) = ALIVE;
+            *board_get(board, 5, 3) = ALIVE;
+            *board_get(board, 3, 4) = ALIVE;
+            *board_get(board, 4, 4) = ALIVE;
+            *board_get(board, 4, 5) = ALIVE;
+            break;
+        }
         default: randomize_board(board); break;
     }
 
@@ -144,7 +156,7 @@ board_t* create_board(initial_state state) {
 }
 
 // Clone a board
-board_t* clone_board(const board_t* board) {
+board_t* clone_board(board_t* board) {
     board_t* clone = malloc(sizeof(board_t));
     int i, j;
     for(i = 0; i < N; i++) {

@@ -1,2 +1,2 @@
 all:
-	gcc -o gol gol.c
+	gcc -Wall -Wextra -pedantic-errors -o gol gol.c
