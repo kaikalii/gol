@@ -6,16 +6,14 @@
 
 enum { N = 8 };
 
-typedef struct {
-    char grid[N][N];
-} board_t;
+typedef char board_t[N][N];
 
 char DEAD = '.';
 char ALIVE = 'X';
 int PERIOD_MS = 200;
 
 typedef enum {
-    random,
+    _random,
     blinker,
     toad,
     beacon,
@@ -37,7 +35,7 @@ int main(int argc, char** argv) {
     // Parse cmd line args
     int i;
     int forever = 0;
-    initial_state state = random;
+    initial_state state = _random;
     for(i = 1; i < argc; i++) {
         char* arg = argv[i];
         string_to_lower(arg);
@@ -87,11 +85,9 @@ board_t* create_board(initial_state state) {
     int i, j;
     for(i = 0; i < N; i++) {
         for(j = 0; j < N; j++) {
-            board->grid[i][j] = DEAD;
+            (*board)[i][j] = DEAD;
         }
     }
-    printf("%d\n", state);
-    printf("%d\n", state == blinker);
 
     switch (state) {
         case blinker: {
@@ -137,7 +133,7 @@ board_t* clone_board(const board_t* board) {
     int i, j;
     for(i = 0; i < N; i++) {
         for(j = 0; j < N; j++) {
-            clone->grid[i][j] = board->grid[i][j];
+            (*clone)[i][j] = (*board)[i][j];
         }
     }
     return clone;
@@ -160,9 +156,9 @@ void randomize_board(board_t* board) {
     }
 }
 
-// Access a board cell
+// Safely access a board cell. Understands the board is toroidal
 char* board_get(board_t* board, int i, int j) {
-    return &board->grid[mod(j, N)][mod(i, N)];
+    return &(*board)[mod(j, N)][mod(i, N)];
 }
 
 // Advance the board
