@@ -1,16 +1,32 @@
+/*
+This is a very simple implementation of Conway's game of life.
+
+By default, running this program will show 4 generations of the
+game with a random initial configuration. 4 presets can be
+specified by passing their names as command line arguments:
+
+    - blinker
+    - toad
+    - beacon
+    - glider
+
+The command line flag '-f' will enable "forever" mode, which will
+simulate the game until iterrupted.
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
 #include <time.h>
 
+// Game constants
 enum { N = 8 };
+const char DEAD = '.';
+const char ALIVE = 'X';
+const int PERIOD_MS = 200;
 
 typedef char board_t[N][N];
-
-char DEAD = '.';
-char ALIVE = 'X';
-int PERIOD_MS = 200;
 
 typedef enum {
     _random,
@@ -208,7 +224,7 @@ void print_board(board_t* board) {
     printf("\n");
 }
 
-// Cross-platform sleep function
+// Sleep function
 void sleep_ms(int milliseconds) {
     struct timespec ts;
     ts.tv_sec = milliseconds / 1000;
